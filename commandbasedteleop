@@ -1,5 +1,3 @@
-import android.annotation.SuppressLint;
-
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,7 +18,6 @@ public class commandbasedteleop extends CommandOpMode {
 
     public static final double MID_SERVO   =  0.5 ;
 
-    @SuppressLint("SuspiciousIndentation")
     @Override
     public void initialize() {
         waitForStart();
@@ -29,7 +26,6 @@ public class commandbasedteleop extends CommandOpMode {
             double drive;
             double turn;
             double max;
-            double power = 0.5;
 
                 driveOne  = hardwareMap.get(DcMotor.class, "drive_one");
                 driveTwo = hardwareMap.get(DcMotor.class, "drive_two");
@@ -65,7 +61,7 @@ public class commandbasedteleop extends CommandOpMode {
                         }
 
                         driveOne.setPower(left);
-                    driveTwo.setPower(right); // set power as double power (later make incr speed??)
+                    driveTwo.setPower(right);
                     driveThree.setPower(left);
                     driveFour.setPower(right);
 
