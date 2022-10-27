@@ -1,0 +1,93 @@
+import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+
+@TeleOp(name="Robot", group="CommandOpMode")
+
+public class commandbasedteleop extends CommandOpMode {
+    public DcMotor  driveOne = null;
+    public DcMotor  driveTwo = null;
+    public DcMotor  driveThree = null;
+    public DcMotor  driveFour = null;
+    public Servo leftClaw = null;
+    public Servo rightClaw = null;
+
+    double clawOffset = 0;
+
+    public static final double MID_SERVO   =  0.5 ;
+
+    @Override
+    public void initialize() {
+        waitForStart();
+        double left;
+        double right;
+        double drive;
+        double turn;
+        double max;
+
+        driveOne  = hardwareMap.get(DcMotor.class, "drive_one");
+        driveTwo = hardwareMap.get(DcMotor.class, "drive_two");
+        driveThree = hardwareMap.get(DcMotor.class, "drive_three");
+        driveFour = hardwareMap.get(DcMotor.class, "drive_four");
+
+        driveOne.setDirection(DcMotor.Direction.FORWARD);
+        driveTwo.setDirection(DcMotor.Direction.REVERSE);
+        driveThree.setDirection(DcMotor.Direction.FORWARD);
+        driveFour.setDirection(DcMotor.Direction.REVERSE);
+
+        leftClaw  = hardwareMap.get(Servo.class, "left_hand");
+        rightClaw = hardwareMap.get(Servo.class, "right_hand");
+        leftClaw.setPosition(MID_SERVO);
+        rightClaw.setPosition(MID_SERVO);
+
+        telemetry.addData(">", "The robot is ready,, press play");    //
+        telemetry.update();
+
+        //driving
+                    while (opModeIsActive()) {
+                        drive = -gamepad1.left_stick_y;
+                        turn = gamepad1.right_stick_x;
+
+                        left = drive + turn;        //turning but smoother
+                        right = drive - turn;
+
+                        max = Math.max(Math.abs(left), Math.abs(right));
+                        if (max > 1.0) //make sure it doesn't go over 1.0
+                        {
+                            left /= max;
+                            right /= max;
+                        }
+
+                        driveOne.setPower(left);
+                    driveTwo.setPower(right);
+                    driveThree.setPower(left);
+                    driveFour.setPower(right);
+
+                        if (gamepad1.a) {
+                            leftClaw.setPosition(0.3);
+                            rightClaw.setPosition(0.7);
+                        }
+                        else if (gamepad1.b) {
+                            leftClaw.setPosition(0.6);
+                            rightClaw.setPosition(0.4);
+                        }
+
+                clawOffset = Range.clip(clawOffset, -0.5, 0.5);
+                leftClaw.setPosition(MID_SERVO + clawOffset);
+                rightClaw.setPosition(MID_SERVO - clawOffset);
+
+                    telemetry.addData("claw",  "Offset = %.2f", clawOffset);
+                    telemetry.addData("left",  "%.2f", left);
+                    telemetry.addData("right", "%.2f", right);
+                    telemetry.update();
+
+                    sleep(50);
+
+        }
+
+    }
+
+}
+
