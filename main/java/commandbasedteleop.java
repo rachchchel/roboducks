@@ -61,9 +61,9 @@ public class commandbasedteleop extends CommandOpMode {
                         }
 
                         driveOne.setPower(left);
-                    driveTwo.setPower(right);
-                    driveThree.setPower(left);
-                    driveFour.setPower(right);
+                        driveTwo.setPower(right);
+                        driveThree.setPower(left);
+                        driveFour.setPower(right);
 
                         if (gamepad1.a) {
                             leftClaw.setPosition(0.3);
