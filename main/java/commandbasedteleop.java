@@ -39,8 +39,7 @@ public class commandbasedteleop extends CommandOpMode {
 
         leftClaw  = hardwareMap.get(Servo.class, "left_hand");
         rightClaw = hardwareMap.get(Servo.class, "right_hand");
-        leftClaw.setPosition(MID_SERVO);
-        rightClaw.setPosition(MID_SERVO);
+
 
         telemetry.addData(">", "The robot is ready,, press play");    //
         telemetry.update();

@@ -34,8 +34,21 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 // this is a comment
 
-@TeleOp(name="Rachel's Method", group="Linear Opmode")
-public class drivetrainmethod extends LinearOpMode {
+/**
+ * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
+ * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
+ * of the FTC Driver Station. When a selection is made from the menu, the corresponding OpMode
+ * class is instantiated on the Robot Controller and executed.
+ *
+ * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
+ * It includes all the skeletal structure that all linear OpModes contain.
+ *
+ * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+ */
+
+@TeleOp(name="Rachel's Distance Method", group="Linear Opmode")
+public class strafing extends LinearOpMode {
 
     // Declare OpMode members.
     private DcMotor leftFront = null;
@@ -43,6 +56,12 @@ public class drivetrainmethod extends LinearOpMode {
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
     int Target = 766; //motor 28 counts and gearbox
+
+    static final double     COUNTS_PER_MOTOR_REV    = 28 ;
+    static final double     DRIVE_GEAR_REDUCTION    = 5.23 * 5.23 ; //3.61 for 4:1
+    static final double     WHEEL_DIAMETER_MM   = 96 ;
+    static final double     COUNTS_PER_MM         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * 3.1415);
+
 
     @Override
     public void runOpMode() {
@@ -87,16 +106,16 @@ public class drivetrainmethod extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-            driveforward(766, 0.6);
+            driveforward(-300.5, 1);
             sleep(1000);
-            driveforward(800, 0.8);
+          /*  driveforward(800, 0.8);
             sleep(1000);
             driveforward(900, 0.6);
             sleep(1000);
             driveforward(1000, 0.6);
             sleep(1000);
             driveforward(500, 0.6);
-            sleep(1000);
+            sleep(1000); */
 
 
         // run until the end of the match (driver presses STOP)
@@ -121,12 +140,13 @@ public class drivetrainmethod extends LinearOpMode {
 
         }
 
-        void driveforward(int Target, double Speed){
+        void driveforward(double Target, double Speed){
 
-            int newLeftFrontTarget = leftFront.getCurrentPosition() + Target;
-            int newLeftBackTarget = leftBack.getCurrentPosition() + Target;
-            int newRightFrontTarget = rightFront.getCurrentPosition() + Target;
-            int newRightBackTarget = rightBack.getCurrentPosition() + Target;
+
+            int newLeftFrontTarget = leftFront.getCurrentPosition() + (int)(Target * COUNTS_PER_MM);
+            int newLeftBackTarget = leftBack.getCurrentPosition() + (int)(Target *COUNTS_PER_MM);
+            int newRightFrontTarget = rightFront.getCurrentPosition() + (int)(Target * COUNTS_PER_MM);
+            int newRightBackTarget = rightBack.getCurrentPosition() + (int)(Target * COUNTS_PER_MM);
 
 
             leftFront.setTargetPosition(newLeftFrontTarget);
