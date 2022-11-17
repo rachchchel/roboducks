@@ -46,7 +46,7 @@ public class drivetraindistance extends LinearOpMode {
     int Target = 766; //motor 28 counts and gearbox
 
     static final double     COUNTS_PER_MOTOR_REV    = 28 ;
-    static final double     DRIVE_GEAR_REDUCTION    = 5.23 * 5.23 ; //3.61 for 4:1
+    static final double     DRIVE_GEAR_REDUCTION    = 3.61 * 5.23 ; //3.61 for 4:1
     static final double     WHEEL_DIAMETER_MM   = 96 ;
     static final double     COUNTS_PER_MM         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * 3.1415);
 

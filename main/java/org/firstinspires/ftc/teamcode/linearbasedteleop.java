@@ -14,9 +14,9 @@ public class linearbasedteleop extends LinearOpMode {
     public DcMotor leftBack = null;
     public DcMotor rightFront = null;
     public DcMotor rightBack = null;
-    public DcMotor  elevator = null;
+/*    public DcMotor  elevator = null;
     public Servo leftClaw = null;
-    public Servo rightClaw = null;
+    public Servo rightClaw = null; */
 
     double clawOffset = 0;
 
@@ -39,17 +39,17 @@ public class linearbasedteleop extends LinearOpMode {
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
-        elevator    = hardwareMap.get(DcMotor.class, "elevator");
+   /*     elevator    = hardwareMap.get(DcMotor.class, "elevator"); */
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
-        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
+     /*   leftClaw = hardwareMap.get(Servo.class, "leftClaw");
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
         leftClaw.setPosition(MID_SERVO);
-        rightClaw.setPosition(MID_SERVO);
+        rightClaw.setPosition(MID_SERVO); */
 
         telemetry.addData(">", "The robot is ready,, press play");    //
         telemetry.update();
@@ -78,7 +78,7 @@ public class linearbasedteleop extends LinearOpMode {
             rightBack.setPower(right);
 
  //claw code
-            if (gamepad1.right_bumper)
+     /*       if (gamepad1.right_bumper)
                 clawOffset += CLAW_SPEED;
             else if (gamepad1.left_bumper)
                 clawOffset -= CLAW_SPEED;
@@ -93,7 +93,7 @@ public class linearbasedteleop extends LinearOpMode {
             else if (gamepad1.a)
                 elevator.setPower(ELEVATOR_DOWN_POWER);
             else
-                elevator.setPower(0.0);
+                elevator.setPower(0.0); */
 
 
             telemetry.addData("claw",  "Offset = %.2f", clawOffset);
