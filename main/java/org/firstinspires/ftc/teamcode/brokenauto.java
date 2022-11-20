@@ -29,23 +29,30 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @TeleOp(name="Rachel Everything", group="Linear Opmode")
-public class drivingandstrafing extends LinearOpMode {
+public class brokenauto extends LinearOpMode {
 
     // Declare OpMode members.
     private DcMotor leftFront = null;
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
+    public DcMotor  elevator = null;
+    public Servo leftClaw = null;
+    public Servo rightClaw = null;
+    double clawOffset = 0;
+
     int Target = 766; //motor 28 counts and gearbox
 
     BNO055IMU imu;
@@ -100,11 +107,20 @@ public class drivingandstrafing extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        driveforward(2500, 0.6);
+        driveforward(800, 0.6);
         sleep(1000);
-
-
-
+        driveforward(-800, 0.6);
+        sleep(1000);
+        strafing(800, 0.6, true);
+        sleep(1000);
+        strafing(800, 0.6, false);
+        sleep(1000);
+        elevator(true);
+        sleep(1000);
+        elevator(false);
+        sleep(1000);
+        openclaw();
+        closeclaw();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive() ) {
@@ -198,7 +214,6 @@ public class drivingandstrafing extends LinearOpMode {
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-
         int count = 0;
         while (opModeIsActive() /*&& leftFront.isBusy() && leftBack.isBusy() && rightFront.isBusy() && rightBack.isBusy()*/ ) {
             telemetry.addData("Count:", count++);
@@ -209,12 +224,16 @@ public class drivingandstrafing extends LinearOpMode {
             telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
 
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
-            telemetry.addData("Angle:", angles.firstAngle);
+            telemetry.addData("Angle", angles.firstAngle);
+            telemetry.update();
+
+            telemetry.addData("Elevator Height", elevator.getCurrentPosition());
             telemetry.update();
 
             double error = 0 - angles.firstAngle;
             double kp = 0.1;
             double p = error * kp * 0.3;
+
             leftFront.setPower(Speed - p);
             leftBack.setPower(Speed - p);
             rightFront.setPower(Speed + p);
@@ -226,6 +245,28 @@ public class drivingandstrafing extends LinearOpMode {
 
     }
 
+    void elevator(boolean UpDown){
+        if (UpDown = true) {
+            elevator.setTargetPosition(1);
+
+        }
+        else if (UpDown = false) {
+            elevator.setTargetPosition(0);
+
+        }
+
+    }
+
+    void openclaw(){
+        leftClaw.setPosition(0.5);
+        rightClaw.setPosition(0.5);
+
+    }
+
+    void closeclaw(){
+        leftClaw.setPosition(0.1);
+        rightClaw.setPosition(0.1);
+    }
 
     void stopmotors() {
         leftFront.setPower(0);
