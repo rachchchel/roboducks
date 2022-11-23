@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  */
 
 @TeleOp(name="Colour Sensor", group="Linear Opmode")
-@Disabled
+//@Disabled
 public class coloursensor extends LinearOpMode {
 
   // Declare OpMode members.
@@ -42,26 +42,29 @@ public class coloursensor extends LinearOpMode {
       telemetry.addData("val", hsvValues[2]);
       telemetry.update();
 
-      /*
-            if (hsvValues[0] < 50 && hsvValues[0] > 30){
-                if (hsvValues[1] > 0.6){
-                    if (hsvValues[2] > 200){
-                        telemetry.addLine("This could be red");
-                        telemetry.update();
-                    } else{
-                        telemetry.addLine("This is not red: Wrong Value");
-                        telemetry.update();
-                    }
-                } else{
-                    telemetry.addLine("This is not red: Wrong Saturation");
-                    telemetry.update();
-                }
-            } else{
-                telemetry.addLine("This is not red: Wrong Hue");
-                telemetry.update();
-                }
-                */
 
+      if (hsvValues[0] < 150 && hsvValues[0] > 140) {
+        telemetry.addLine("This is green");
+      } else {
+        telemetry.addLine("This is not green: Wrong Hue");
+        telemetry.update();
+      }
+
+      if (hsvValues[0] < 30 && hsvValues[0] > 10) {
+        telemetry.addLine("This is red");
+      } else {
+        telemetry.addLine("This is not red: Wrong Hue");
+        telemetry.update();
+      }
+
+      if (hsvValues[0] < 220 && hsvValues[0] > 190) {
+        if (hsvValues[1] < 0.6 && hsvValues[1] > 0.4) {
+          telemetry.addLine("This is purple");
+        } else {
+          telemetry.addLine("This is not purple: Wrong Hue");
+          telemetry.update();
+        }
+      }
     }
   }
 }
