@@ -139,9 +139,12 @@ public class autonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        elevatorDown();
         elevatorUp();
+        driveforward(100, 0.2);
         getColour();
-        goLocation(0.6, location);
+        sleep(3000);
+        goLocation(0.2, location);
 
        /* driveforward(800, 0.6);
         sleep(1000);
@@ -160,8 +163,6 @@ public class autonomous extends LinearOpMode {
         rightClaw.setPosition(0.5); */
 
 
-
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive() ) {
 
@@ -173,8 +174,8 @@ public class autonomous extends LinearOpMode {
             telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
             telemetry.addData("CurrentElevatorPos", elevator.getCurrentPosition());
 
-            telemetry.addData("Angle:", angles.firstAngle);
-            telemetry.update();
+           /* telemetry.addData("Angle:", angles.firstAngle);
+            telemetry.update(); */
 
         }
         leftFront.setPower(0);
@@ -330,8 +331,6 @@ public class autonomous extends LinearOpMode {
         waitForStart();
         resetRuntime();
 
-        while (runtime.time()<1) {
-
             Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
                     (int) (sensorColor.green() * SCALE_FACTOR),
                     (int) (sensorColor.blue() * SCALE_FACTOR),
@@ -349,7 +348,7 @@ public class autonomous extends LinearOpMode {
 
             } else {
                 telemetry.addLine("This is not green: Wrong Hue");
-                telemetry.update();
+                //telemetry.update();
             }
 
             if (hsvValues[0] < 30 && hsvValues[0] > 10) {
@@ -358,34 +357,37 @@ public class autonomous extends LinearOpMode {
 
             } else {
                 telemetry.addLine("This is not red: Wrong Hue");
-                telemetry.update();
+               // telemetry.update();
             }
 
             if (hsvValues[0] < 220 && hsvValues[0] > 190) {
-                if (hsvValues[1] < 0.6 && hsvValues[1] > 0.4) {
-                    telemetry.addLine("This is purple");
+
+                   telemetry.addLine("This is purple");
                     location = 3;
 
                 } else {
                     telemetry.addLine("This is not purple: Wrong Hue");
-                    telemetry.update();
-                }
+                   // telemetry.update();
+
             }
+            telemetry.addData("loco", location);
+        telemetry.update();
         }
-    }
+
 
     void goLocation(double Speed, int location){
+
         if (location == 1){
-            driveforward(800, 0.6);
-            strafing(800, 0.6, true);
+            driveforward(200, 0.2);
+            strafing(600, 0.2, true);
 
         }
         else if (location == 2){
-            driveforward(800, 0.6);
+            driveforward(200, 0.2);
         }
         else if (location == 3){
-            driveforward(800, 0.6);
-            strafing(800, 0.6, false);
+            driveforward(200, 0.2);
+            strafing(600, 0.2, false);
         }
         else {
             stopmotors();
