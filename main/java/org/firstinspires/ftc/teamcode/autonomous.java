@@ -145,12 +145,28 @@ public class autonomous extends LinearOpMode {
         //close claw
         leftClaw.setPosition(0.5);
         rightClaw.setPosition(0.5);
+        sleep(1000);
 
         elevatorUp();
-        driveforward(650, 0.2);
-        getColour();
-        sleep(3000);
+        driveforward(610, 0.2);
+
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        runtime.reset();
+        while (runtime.time()< 1){
+            getColour();
+        }
+
         goLocation(0.2, location);
+
+        while(1==1 && opModeIsActive()){
+
+            telemetry.addData("hi there", true);
+            telemetry.update();
+
+        }
+        driveforward(500, 0.2);
+        driveforward(-500, 0.2);
+        elevatorDown();
 
        /* driveforward(800, 0.6);
         sleep(1000);
@@ -167,22 +183,6 @@ public class autonomous extends LinearOpMode {
         leftClaw.setPosition(0.5);
         rightClaw.setPosition(0.5); */
 
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive() && runtime.time() < 30 ) {
-
-            // Show the elapsed game time and wheel power.
-            //telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("CurrentLeftFrontPos", leftFront.getCurrentPosition() );
-            telemetry.addData("CurrentLeftBackPos", leftBack.getCurrentPosition() );
-            telemetry.addData("CurrentRightFrontPos", rightFront.getCurrentPosition() );
-            telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
-            telemetry.addData("CurrentElevatorPos", elevator.getCurrentPosition());
-
-           // telemetry.addData("Angle:", angles.firstAngle);
-            telemetry.update();
-
-        }
         leftFront.setPower(0);
         leftBack.setPower(0);
         rightFront.setPower(0);
@@ -232,7 +232,7 @@ public class autonomous extends LinearOpMode {
         rightBack.setPower(Speed);
         int count = 0;
 
-        while (opModeIsActive() || leftFront.isBusy() || leftBack.isBusy() || rightFront.isBusy() || rightBack.isBusy() ) {
+        while (opModeIsActive() && leftFront.isBusy() && leftBack.isBusy() && rightFront.isBusy() && rightBack.isBusy() ) {
             telemetry.addData("Count:", count++);
             telemetry.addData("CurrentLeftFrontPos", leftFront.getCurrentPosition() );
             telemetry.addData("CurrentLeftBackPos", leftBack.getCurrentPosition() );
@@ -250,13 +250,13 @@ public class autonomous extends LinearOpMode {
         resetEncoders();
 
         int target = (int)(Distance * COUNTS_PER_MM);
+        double  steer;
 
         /*
         int newLeftFrontTarget = leftFront.getCurrentPosition() + Target;
         int newLeftBackTarget = leftBack.getCurrentPosition() + Target;
         int newRightFrontTarget = rightFront.getCurrentPosition() + Target;
         int newRightBackTarget = rightBack.getCurrentPosition() + Target;
-
          */
 
         leftFront.setTargetPosition(target);
@@ -280,7 +280,7 @@ public class autonomous extends LinearOpMode {
             telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
 
              */
-            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
             telemetry.addData("Angle", angles.firstAngle);
             telemetry.update();
 
@@ -289,12 +289,21 @@ public class autonomous extends LinearOpMode {
             double kp = 0.1;
             double p = error * kp * 0.3;
 
-            leftFront.setPower(Speed - p);
-            leftBack.setPower(Speed - p);
-            rightFront.setPower(Speed + p);
-            rightBack.setPower(Speed + p);
+            if (Distance > 0) {     //forward
+                leftFront.setPower(Speed - p);
+                leftBack.setPower(Speed - p);
+                rightFront.setPower(Speed + p);
+                rightBack.setPower(Speed + p);
 
+            }
+            else if (Distance < 0){     //backward
+                leftFront.setPower(Speed + p);
+                leftBack.setPower(Speed + p);
+                rightFront.setPower(Speed - p);
+                rightBack.setPower(Speed - p);
+            }
         }
+
 
         stopmotors();
 
@@ -309,7 +318,6 @@ public class autonomous extends LinearOpMode {
 
     public void elevatorDown(){
 
-        resetEncoders();
         elevator.setTargetPosition(minimumElevatorHeight);
         elevator.setPower(0.4);
 
@@ -382,14 +390,17 @@ public class autonomous extends LinearOpMode {
     void goLocation(double Speed, int location){
 
         if (location == 1){
-            strafing(-800, 0.2, false); //go left
+            strafing(-1100, 0.5, false); //go left
+            sleep(300);
 
         }
         else if (location == 2){
             sleep(300);
         }
         else if (location == 3){
-            strafing(800, 0.2, true); //go right
+            strafing(1100, 0.5, true); //go right
+
+            sleep(300);
         }
         else {
             stopmotors();
