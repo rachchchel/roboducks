@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 /**
@@ -22,6 +23,7 @@ public class coloursensor extends LinearOpMode {
   float hsvValues[] = {0F, 0F, 0F};
   final float values[] = hsvValues;
   final double SCALE_FACTOR = 255;
+  public DcMotor elevator = null;
 
   @Override
   public void runOpMode() {

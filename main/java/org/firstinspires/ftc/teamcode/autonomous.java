@@ -57,6 +57,9 @@ public class autonomous extends LinearOpMode {
     public Servo rightClaw = null;
     double clawOffset = 0;
 
+    int maximumElevatorHeight = -1111;
+    int minimumElevatorHeight = 0;
+
     int Target = 766; //motor 28 counts and gearbox
 
     ColorSensor sensorColor;
@@ -78,9 +81,6 @@ public class autonomous extends LinearOpMode {
     static final double     WHEEL_DIAMETER_MM   = 96 ;
     static final double     COUNTS_PER_MM         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
 
-    //edit the numbers here !!!!!!
-    int maximumElevatorHeight = 1;
-    int minimumElevatorHeight = 0;
 
 
 
@@ -136,12 +136,18 @@ public class autonomous extends LinearOpMode {
         telemetry.addData("CurrentElevatorPos", elevator.getCurrentPosition());
         telemetry.update();
 
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
 
-        elevatorDown();
+        // Wait for the game to start (driver presses PLAY)
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setTargetPosition(0);
+        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        waitForStart();
+        //close claw
+        leftClaw.setPosition(0.5);
+        rightClaw.setPosition(0.5);
+
         elevatorUp();
-        driveforward(100, 0.2);
+        driveforward(650, 0.2);
         getColour();
         sleep(3000);
         goLocation(0.2, location);
@@ -155,8 +161,7 @@ public class autonomous extends LinearOpMode {
         strafing(-800, 0.6, false);
         sleep(1000);
 
-        elevatorUp();
-        elevatorDown();
+
 
         //claw closing
         leftClaw.setPosition(0.5);
@@ -164,7 +169,7 @@ public class autonomous extends LinearOpMode {
 
 
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive() ) {
+        while (opModeIsActive() && runtime.time() < 30 ) {
 
             // Show the elapsed game time and wheel power.
             //telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -174,8 +179,8 @@ public class autonomous extends LinearOpMode {
             telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
             telemetry.addData("CurrentElevatorPos", elevator.getCurrentPosition());
 
-           /* telemetry.addData("Angle:", angles.firstAngle);
-            telemetry.update(); */
+           // telemetry.addData("Angle:", angles.firstAngle);
+            telemetry.update();
 
         }
         leftFront.setPower(0);
@@ -190,7 +195,7 @@ public class autonomous extends LinearOpMode {
 
         resetEncoders();
 
-        if (Direction = true) {
+        if (Direction = true) { //right
 
             int newLeftFrontTarget = leftFront.getCurrentPosition() + Target;
             int newLeftBackTarget = leftBack.getCurrentPosition() - Target;
@@ -202,7 +207,7 @@ public class autonomous extends LinearOpMode {
             rightFront.setTargetPosition(newRightFrontTarget);
             rightBack.setTargetPosition(newRightBackTarget);
         }
-        else if (Direction = false) {
+        else if (Direction = false) { //left
             int newLeftFrontTarget = leftFront.getCurrentPosition() - Target;
             int newLeftBackTarget = leftBack.getCurrentPosition() + Target;
             int newRightFrontTarget = rightFront.getCurrentPosition() + Target;
@@ -297,7 +302,6 @@ public class autonomous extends LinearOpMode {
 
     public void elevatorUp(){
 
-        resetEncoders();
         elevator.setTargetPosition(maximumElevatorHeight);
         elevator.setPower(0.4);
 
@@ -378,16 +382,14 @@ public class autonomous extends LinearOpMode {
     void goLocation(double Speed, int location){
 
         if (location == 1){
-            driveforward(200, 0.2);
-            strafing(600, 0.2, true);
+            strafing(-800, 0.2, false); //go left
 
         }
         else if (location == 2){
-            driveforward(200, 0.2);
+            sleep(300);
         }
         else if (location == 3){
-            driveforward(200, 0.2);
-            strafing(600, 0.2, false);
+            strafing(800, 0.2, true); //go right
         }
         else {
             stopmotors();

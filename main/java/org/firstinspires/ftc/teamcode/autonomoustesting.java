@@ -29,19 +29,23 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@TeleOp(name="Rachel Everything", group="Linear Opmode")
-public class brokenauto extends LinearOpMode {
+@TeleOp(name="Autonomous Testing", group="Linear Opmode")
+public class autonomoustesting extends LinearOpMode {
 
     // Declare OpMode members.
     private DcMotor leftFront = null;
@@ -55,8 +59,30 @@ public class brokenauto extends LinearOpMode {
 
     int Target = 766; //motor 28 counts and gearbox
 
+    ColorSensor sensorColor;
+
+    int location;
+
+    float hsvValues[] = {0F, 0F, 0F};
+    final float values[] = hsvValues;
+    final double SCALE_FACTOR = 255;
+
+
     BNO055IMU imu;
     Orientation angles;
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    static final double     COUNTS_PER_MOTOR_REV    = 28 ;
+    static final double     DRIVE_GEAR_REDUCTION    = 3.61 * 5.23 ; //3.61 for 4:1
+    static final double     WHEEL_DIAMETER_MM   = 96 ;
+    static final double     COUNTS_PER_MM         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
+
+    //edit the numbers here !!!!!!
+    int maximumElevatorHeight = 1;
+    int minimumElevatorHeight = 0;
+
+
 
     @Override
     public void runOpMode() {
@@ -74,6 +100,10 @@ public class brokenauto extends LinearOpMode {
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
+
+        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
+        rightClaw = hardwareMap.get(Servo.class, "rightClaw");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -98,32 +128,49 @@ public class brokenauto extends LinearOpMode {
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-        telemetry.addData("CurrentLeftFrontPos", leftFront.getCurrentPosition() );
-        telemetry.addData("CurrentLeftBackPos", leftBack.getCurrentPosition() );
-        telemetry.addData("CurrentRightFrontPos", rightFront.getCurrentPosition() );
-        telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
-        telemetry.update();
-
-        // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        driveforward(800, 0.6);
+
+        while(opModeIsActive()) {
+
+            telemetry.addData("CurrentElevatorPos", elevator.getCurrentPosition());
+            telemetry.update();
+        }
+        }
+        // Wait for the game to start (driver presses PLAY)
+        /*for autonomous:
+        elevator goes up
+        move forward
+        sensor detect colour
+        move to correct pos
+        move back
+        lower elevator
+         */
+
+        /*elevatorUp();
+        driveforward(650, 0.2);
+        getColour();
+        sleep(3000);
+        goLocation(0.2, location); */
+
+       /* driveforward(800, 0.6);
         sleep(1000);
         driveforward(-800, 0.6);
         sleep(1000);
         strafing(800, 0.6, true);
         sleep(1000);
-        strafing(800, 0.6, false);
+        strafing(-800, 0.6, false);
         sleep(1000);
-        elevator(true);
-        sleep(1000);
-        elevator(false);
-        sleep(1000);
-        openclaw();
-        closeclaw();
+
+        elevatorUp();
+        elevatorDown();
+
+        //claw closing
+        leftClaw.setPosition(0.5);
+        rightClaw.setPosition(0.5); */
+
 
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive() ) {
+       /* while (opModeIsActive() && runtime.time() < 30 ) {
 
             // Show the elapsed game time and wheel power.
             //telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -131,20 +178,23 @@ public class brokenauto extends LinearOpMode {
             telemetry.addData("CurrentLeftBackPos", leftBack.getCurrentPosition() );
             telemetry.addData("CurrentRightFrontPos", rightFront.getCurrentPosition() );
             telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
+            telemetry.addData("CurrentElevatorPos", elevator.getCurrentPosition());
 
-            telemetry.addData("Angle:", angles.firstAngle);
+           // telemetry.addData("Angle:", angles.firstAngle);
             telemetry.update();
 
         }
         leftFront.setPower(0);
         leftBack.setPower(0);
         rightFront.setPower(0);
-        rightBack.setPower(0);
+        rightBack.setPower(0); */
 
 
-    }
+
 
     void strafing(int Target, double Speed, boolean Direction){
+
+        resetEncoders();
 
         if (Direction = true) { //right
 
@@ -158,7 +208,7 @@ public class brokenauto extends LinearOpMode {
             rightFront.setTargetPosition(newRightFrontTarget);
             rightBack.setTargetPosition(newRightBackTarget);
         }
-        else { //left
+        else if (Direction = false) { //left
             int newLeftFrontTarget = leftFront.getCurrentPosition() - Target;
             int newLeftBackTarget = leftBack.getCurrentPosition() + Target;
             int newRightFrontTarget = rightFront.getCurrentPosition() + Target;
@@ -196,18 +246,24 @@ public class brokenauto extends LinearOpMode {
 
     }
 
-    void driveforward(int Target, double Speed){
+    void driveforward(int Distance, double Speed){
 
+        resetEncoders();
+
+        int target = (int)(Distance * COUNTS_PER_MM);
+
+        /*
         int newLeftFrontTarget = leftFront.getCurrentPosition() + Target;
         int newLeftBackTarget = leftBack.getCurrentPosition() + Target;
         int newRightFrontTarget = rightFront.getCurrentPosition() + Target;
         int newRightBackTarget = rightBack.getCurrentPosition() + Target;
 
+         */
 
-        leftFront.setTargetPosition(newLeftFrontTarget);
-        leftBack.setTargetPosition(newLeftBackTarget);
-        rightFront.setTargetPosition(newRightFrontTarget);
-        rightBack.setTargetPosition(newRightBackTarget);
+        leftFront.setTargetPosition(target);
+        leftBack.setTargetPosition(target);
+        rightFront.setTargetPosition(target);
+        rightBack.setTargetPosition(target);
 
         leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -215,7 +271,8 @@ public class brokenauto extends LinearOpMode {
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         int count = 0;
-        while (opModeIsActive() /*&& leftFront.isBusy() && leftBack.isBusy() && rightFront.isBusy() && rightBack.isBusy()*/ ) {
+        while (opModeIsActive() && leftFront.isBusy() && leftBack.isBusy() && rightFront.isBusy() && rightBack.isBusy() ) {
+            /*
             telemetry.addData("Count:", count++);
             telemetry.addData("leftError", newLeftFrontTarget - leftFront.getCurrentPosition());
             telemetry.addData("CurrentLeftFrontPos", leftFront.getCurrentPosition() );
@@ -223,12 +280,11 @@ public class brokenauto extends LinearOpMode {
             telemetry.addData("CurrentRightFrontPos", rightFront.getCurrentPosition() );
             telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
 
+             */
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES);
             telemetry.addData("Angle", angles.firstAngle);
             telemetry.update();
 
-            telemetry.addData("Elevator Height", elevator.getCurrentPosition());
-            telemetry.update();
 
             double error = 0 - angles.firstAngle;
             double kp = 0.1;
@@ -245,27 +301,27 @@ public class brokenauto extends LinearOpMode {
 
     }
 
-    void elevator(boolean UpDown){
-        if (UpDown = true) {
-            elevator.setTargetPosition(1);
+    public void elevatorUp(){
 
-        }
-        else if (UpDown = false) {
-            elevator.setTargetPosition(0);
-
-        }
+        resetEncoders();
+        elevator.setTargetPosition(maximumElevatorHeight);
+        elevator.setPower(0.4);
 
     }
 
-    void openclaw(){
-        leftClaw.setPosition(0.5);
-        rightClaw.setPosition(0.5);
+    public void elevatorDown(){
+
+        resetEncoders();
+        elevator.setTargetPosition(minimumElevatorHeight);
+        elevator.setPower(0.4);
 
     }
 
-    void closeclaw(){
-        leftClaw.setPosition(0.1);
-        rightClaw.setPosition(0.1);
+    public void resetEncoders(){
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     void stopmotors() {
@@ -274,4 +330,76 @@ public class brokenauto extends LinearOpMode {
         rightFront.setPower(0);
         rightBack.setPower(0);
     }
+
+    void getColour(){
+        sensorColor = hardwareMap.get(ColorSensor.class, "colourSensor");
+
+        waitForStart();
+        resetRuntime();
+
+            Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
+                    (int) (sensorColor.green() * SCALE_FACTOR),
+                    (int) (sensorColor.blue() * SCALE_FACTOR),
+                    hsvValues);
+
+            telemetry.addData("hue", hsvValues[0]);
+            telemetry.addData("Sat", hsvValues[1]);
+            telemetry.addData("val", hsvValues[2]);
+            telemetry.update();
+
+
+            if (hsvValues[0] < 150 && hsvValues[0] > 140) {
+                telemetry.addLine("This is green");
+                location = 1;
+
+            } else {
+                telemetry.addLine("This is not green: Wrong Hue");
+                //telemetry.update();
+            }
+
+            if (hsvValues[0] < 30 && hsvValues[0] > 10) {
+                telemetry.addLine("This is red");
+                location = 2;
+
+            } else {
+                telemetry.addLine("This is not red: Wrong Hue");
+               // telemetry.update();
+            }
+
+            if (hsvValues[0] < 220 && hsvValues[0] > 190) {
+
+                   telemetry.addLine("This is purple");
+                    location = 3;
+
+                } else {
+                    telemetry.addLine("This is not purple: Wrong Hue");
+                   // telemetry.update();
+
+            }
+            telemetry.addData("loco", location);
+        telemetry.update();
+        }
+
+
+    void goLocation(double Speed, int location){
+
+        if (location == 1){
+            strafing(-600, 0.2, false); //go left
+
+        }
+        else if (location == 2){
+            sleep(300);
+        }
+        else if (location == 3){
+            strafing(600, 0.2, true); //go right
+        }
+        else {
+            stopmotors();
+        }
+    }
 }
+
+
+
+
+
