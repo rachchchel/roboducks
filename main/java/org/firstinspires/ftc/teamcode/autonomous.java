@@ -158,12 +158,6 @@ public class autonomous extends LinearOpMode {
 
         goLocation(0.2, location);
 
-        while(1==1 && opModeIsActive()){
-
-            telemetry.addData("hi there", true);
-            telemetry.update();
-
-        }
         driveforward(500, 0.2);
         driveforward(-500, 0.2);
         elevatorDown();
@@ -226,10 +220,6 @@ public class autonomous extends LinearOpMode {
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        leftFront.setPower(Speed);
-        leftBack.setPower(Speed);
-        rightFront.setPower(Speed);
-        rightBack.setPower(Speed);
         int count = 0;
 
         while (opModeIsActive() && leftFront.isBusy() && leftBack.isBusy() && rightFront.isBusy() && rightBack.isBusy() ) {
@@ -239,6 +229,11 @@ public class autonomous extends LinearOpMode {
             telemetry.addData("CurrentRightFrontPos", rightFront.getCurrentPosition() );
             telemetry.addData("CurrentRightBackPos", rightBack.getCurrentPosition() );
             telemetry.update();
+
+            leftFront.setPower(Speed);
+            leftBack.setPower(Speed);
+            rightFront.setPower(Speed);
+            rightBack.setPower(Speed);
 
         }
         stopmotors();
